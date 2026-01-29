@@ -6,6 +6,8 @@ app.get("/",(req,res)=>{
     res.send("Dating app backend running!")
 })
 
+app.use('/auth',require("./src/routes/authRoute"))
+
 app.listen(port,()=>{
     console.log(`Dating app running on http://localhost:${port}/` )
 })

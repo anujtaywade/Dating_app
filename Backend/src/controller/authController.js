@@ -5,20 +5,23 @@ exports.login=async (req,es) => {
         const {email , password} = req.body ;
 
         if (!email , !password , !name) {
-            return res.send(400).json({message : "All feilds are mandatory"})
+            return res.status(400).json({message : "All feilds are mandatory"})
         }
         
         const existingUser = await user.findOne({email})
 
         if (existingUser) {
-            res.send(409).json({message : "user already exist"})
+            res.status(409).json({message : "user already exist"})
         }
 
-        const hashedPassword = await brcypt.hash(password,10)
+        const isMatched = user.matchPassword(password) ;
+        if (isMatched){
+            return res.status(400).json({message : "Credentials Matched"})
+        }   
 
-        const
 
     } catch (error) {
-        
+        console.log(error)
+        res.status(500).json({message : "Internal Server error"})
     }
 }

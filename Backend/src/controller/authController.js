@@ -1,27 +1,42 @@
 const brcypt = require("bcrypt")
 
-exports.login=async (req,es) => {
+exports.login=async (req,res) => {
     try {
-        const {email , password} = req.body ;
+        const {phone , googleId} = req.body ;
 
-        if (!email , !password , !name) {
-            return res.status(400).json({message : "All feilds are mandatory"})
+        if (!phone && !googleId ) {
+            return res.status(400).json({message : "Phone or google login required"})
         }
         
-        const existingUser = await user.findOne({email})
+        let authUser ;
 
-        if (existingUser) {
-            res.status(409).json({message : "user already exist"})
+        if (phone) {
+            authUser = await user.findOne({phone})
+
+            if(!user){
+                authUser =await user.create({
+                    phone,
+                    authProvider : "phone",
+                    isVerified : true
+                })
+            }
         }
 
-        const isMatched = user.matchPassword(password) ;
-        if (isMatched){
-            return res.status(400).json({message : "Credentials Matched"})
-        }   
+        if (googleId){
+            authUser = await user.findOne({googleId})
 
+            if (!googleId){
+                authUser =await user.create({
+                    googleId,
+                    authProvider : "google",
+                    isVerified : true
+                })
+            }
+        }
 
     } catch (error) {
         console.log(error)
         res.status(500).json({message : "Internal Server error"})
     }
 }
+

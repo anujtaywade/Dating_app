@@ -1,4 +1,3 @@
-const brcypt = require("bcrypt")
 
 exports.login=async (req,res) => {
     try {
@@ -40,3 +39,11 @@ exports.login=async (req,res) => {
     }
 }
 
+exports.logout = async (req,res) => {
+    try {
+         res.status(200).json({message : "Logout successful"})
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message : "Internl Server Error"})
+    }
+}

@@ -13,10 +13,10 @@ exports.login = async (req, res) => {
     let authUser;
 
     if (phone) {
-      authUser = await user.findOne({ phone });
+      authUser = await User.findOne({ phone });
 
       if (!authUser) {
-        authUser = await user.create({
+        authUser = await User.create({
           phone,
           authProvider: "phone",
           isVerified: true,
@@ -25,10 +25,10 @@ exports.login = async (req, res) => {
     }
 
     if (googleId) {
-      authUser = await user.findOne({ googleId });
+      authUser = await User.findOne({ googleId });
 
       if (!authUser) {
-        authUser = await user.create({
+        authUser = await User.create({
           googleId,
           authProvider: "google",
           isVerified: true,

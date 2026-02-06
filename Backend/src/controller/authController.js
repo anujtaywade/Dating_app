@@ -1,4 +1,6 @@
 const jwt = require("jsonwebtoken");
+const userModel = require("../models/userModel");
+const { json } = require("express");
 
 exports.login = async (req, res) => {
   try {
@@ -44,6 +46,23 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: "Internal Server error" });
   }
 };
+
+exports.authMe =async (req,res) => {
+  try {
+    const currUser = await User.findById(req.userId)
+
+    if (!currUser){
+      return res.status(401).json({message : "User not found"})
+    }
+
+    res.status(200).json({
+      success : true,
+      currUser
+    })
+  } catch (error) {
+    res.status(500).json({message : "internal Server Error"})
+  }
+}
 
 exports.logout = async (req, res) => {
   try {

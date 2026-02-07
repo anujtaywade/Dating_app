@@ -1,6 +1,5 @@
 const router = require('express').Router()
-const {login,logout} = require('../controller/authController')
-const {authMe} = require('../controller/authController')
+const {login,logout,authMe} = require('../controller/authController')
 const {protect} = require('../middleware/authMiddleware')
 
 

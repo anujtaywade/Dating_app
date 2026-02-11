@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const {completeProfile} = require('../controller/profileController')
+const {completeProfile} = require('../controller/profileCompleteController')
 
 router.post('/profile',completeProfile)
 

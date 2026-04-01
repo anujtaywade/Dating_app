@@ -40,7 +40,10 @@ exports.login = async (req, res) => {
     const token = jwt.sign({ id: authUser._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
-    res.status(200).json({ message: "Login Sucessfull" });
+    res.status(200).json({ message: "Login Sucessfull" ,
+      token,
+      user : authUser
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal Server error" });

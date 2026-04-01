@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const userModel = require("../models/userModel");
+const User = require("../models/userModel");
 const { json } = require("express");
 
 exports.login = async (req, res) => {
@@ -7,46 +7,55 @@ exports.login = async (req, res) => {
     const { phone, googleId } = req.body;
 
     if (!phone && !googleId) {
-      return res
-        .status(400)
-        .json({ message: "Phone or google login required" });
+      return res.status(400).json({
+        message: "Phone or Google login required"
+      });
     }
 
     let authUser;
 
     if (phone) {
+      if (phone.length !== 10) {
+        return res.status(400).json({ message: "Invalid phone number" });
+      }
+
       authUser = await User.findOne({ phone });
 
       if (!authUser) {
         authUser = await User.create({
           phone,
           authProvider: "phone",
-          isVerified: true,
+          isVerified: true
         });
       }
-    }
 
-    if (googleId) {
+    } else if (googleId) {
       authUser = await User.findOne({ googleId });
 
       if (!authUser) {
         authUser = await User.create({
           googleId,
           authProvider: "google",
-          isVerified: true,
+          isVerified: true
         });
       }
     }
-    const token = jwt.sign({ id: authUser._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
-    res.status(200).json({ message: "Login Sucessfull" ,
+
+    const token = jwt.sign(
+      { id: authUser._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.status(200).json({
+      message: "Login Successful",
       token,
-      user : authUser
+      User: authUser
     });
+
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Internal Server error" });
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 

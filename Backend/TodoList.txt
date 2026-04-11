@@ -1,0 +1,2 @@
+1. For now we have twilio change it too Firebase (when we r building frontend)
+2. profile completion

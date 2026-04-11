@@ -1,3 +1,6 @@
+import User from "../models/userModel" 
+
+
 exports.completeProfile= async (req,res) => {
     try {
         const userId = req.user.id

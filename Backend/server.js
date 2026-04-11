@@ -13,6 +13,7 @@ app.get("/",(req,res)=>{
 app.use(express.json());
 connectDB();
 app.use('/auth',require("./src/routes/authRoute"))
+app.use('/',require("./src/routes/profileRoute"))
 
 app.listen(port,()=>{
     console.log(`Dating app running on http://localhost:${port}/` )

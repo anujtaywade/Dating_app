@@ -53,7 +53,7 @@ const userSchema =new mongoose.Schema({
 
    bio : String,
 
-   photo : [String],
+   photos : [String],
 
    location : {
       city : String,

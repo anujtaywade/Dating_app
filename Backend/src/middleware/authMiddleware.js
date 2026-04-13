@@ -10,7 +10,7 @@ exports.protect = async (req,res,next) => {
         }
 
         if(!token){
-            res.status(401).json({message : "No Token provided , no Authorization"})
+            return res.status(401).json({message : "No Token provided , no Authorization"})
         }
 
         const decoded = jwt.verify(token,process.env.JWT_SECRET) 
@@ -20,6 +20,6 @@ exports.protect = async (req,res,next) => {
         next()
     } catch (error) {
         console.log(error)
-        res.status(401).json({message : "Token Failed"})
+        return res.status(401).json({message : "Token Failed"})
     }
 }

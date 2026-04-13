@@ -1,9 +1,9 @@
-import User from "../models/userModel" 
+const User = require("../models/userModel") 
 
 
 exports.completeProfile= async (req,res) => {
     try {
-        const userId = req.user.id
+        const userId = req.userId
 
         const {
             name ,
@@ -17,14 +17,14 @@ exports.completeProfile= async (req,res) => {
         const user = await User.findById(userId)
 
         if(!user) {
-            res.status(404).json({message : "User not found"})
+            return res.status(404).json({message : "User not found"})
         }
 
-        user.name = name || user.name,
-        user.dob = dob || user.dob ,
+        user.name = name || user.name
+        user.dob = dob || user.dob 
         user.gender = gender || user.gender
-        user.intrestedIn = intrestedIn || user.intrestedIn,
-        user.bio = bio || user.bio ,
+        user.intrestedIn = intrestedIn || user.intrestedIn
+        user.bio = bio || user.bio 
         user.photos = photos || user.photos 
         
         if (
@@ -41,12 +41,12 @@ exports.completeProfile= async (req,res) => {
 
         await user.save();
 
-        res.status(200).json({message : "profile updated ",
+        return res.status(200).json({message : "profile updated ",
             profileCompleted : user.profileCompleted,
             user
         })
     } catch (error) {
         console.log(error)
-        res.status(500).json({message : "Internal Server Error "})
+        return res.status(500).json({message : "Internal Server Error "})
     }
 }

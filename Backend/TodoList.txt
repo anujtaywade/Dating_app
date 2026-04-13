@@ -1,4 +1,5 @@
 1. For now we have twilio change it too Firebase (when we r building frontend)
-2. profile completion
+2. profile completion api ✅
 3. add a profile middleware 
-4. test profile route 
+4. test profile route   ✅
+5. test a profile middleware api

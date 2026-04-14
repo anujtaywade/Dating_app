@@ -1,7 +1,9 @@
 const router = require('express').Router()
-const {likes} = require('../controller/')
+const { protect } = require('../middleware/authMiddleware');
+const { profileCompleteCheck } = require('../middleware/profileMiddleware');
+const {sendLike} = require('../controller/likeController')
 
-router.post('/likes',likes)
+router.post('/sendLikes/:userId',protect,profileCompleteCheck,sendLike)
 
 
 module.exports = router ;

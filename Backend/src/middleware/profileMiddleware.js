@@ -1,4 +1,4 @@
-const User = require("../models/User");
+const User = require("../models/userModel");
 
 exports.profileCompleteCheck = async (req, res, next) => {
   try {

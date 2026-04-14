@@ -70,14 +70,14 @@ exports.sendLike = async (req, res) => {
     // 🔔 (optional) notification placeholder
     // TODO: integrate push notification later
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Request sent successfully",
       like
     });
 
   } catch (error) {
     console.log(error);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Server error"
     });
   }

@@ -14,6 +14,7 @@ app.use(express.json());
 connectDB();
 app.use('/auth',require("./src/routes/authRoute"))
 app.use('/',require("./src/routes/profileRoute"))
+app.use('/',require("./src/routes/likeRoute"))
 
 app.listen(port,()=>{
     console.log(`Dating app running on http://localhost:${port}/` )

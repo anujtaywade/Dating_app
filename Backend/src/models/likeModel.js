@@ -22,7 +22,15 @@ const likeSchema = new mongoose.Schema({
     type: String,
     enum: ["pending", "accepted", "rejected"],
     default: "pending"
-  }
+  },
+
+  likesSentToday: {
+  type: Number,
+  default: 0
+},
+lastLikeDate: {
+  type: Date
+}
 
 }, { timestamps: true });
 

@@ -1,5 +1,10 @@
 1. For now we have twilio change it too Firebase (when we r building frontend)
 2. profile completion api ✅
-3. add a profile middleware 
+3. add a profile middleware ✅
 4. test profile route   ✅
-5. test a profile middleware api
+5. test a profile middleware api ✅
+6. like schema 
+7. send like from person A to B
+8. view req by B from A 
+9. accept like notify A & B
+10. reject like dont notify 

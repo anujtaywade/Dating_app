@@ -1,5 +1,6 @@
 const Like = require("../models/likeModel");
 const User = require("../models/userModel");
+const Match = require("../models/matchModel");
 
 
 exports.sendLike = async (req, res) => {
@@ -100,6 +101,99 @@ exports.getRequests = async (req, res) => {
     res.status(200).json({
       count: requests.length,
       requests
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Server error"
+    });
+  }
+};
+
+
+
+exports.acceptLike = async (req, res) => {
+  try {
+    const likeId = req.params.id;
+    const userId = req.user.id;
+
+    const like = await Like.findById(likeId);
+
+    if (!like) {
+      return res.status(404).json({
+        message: "Request not found"
+      });
+    }
+
+    // 🚫 Only receiver can accept
+    if (like.toUser.toString() !== userId) {
+      return res.status(403).json({
+        message: "Not authorized"
+      });
+    }
+
+    // 🚫 Already handled
+    if (like.status !== "pending") {
+      return res.status(400).json({
+        message: "Request already handled"
+      });
+    }
+
+    // ✅ Accept
+    like.status = "accepted";
+    await like.save();
+
+    // 🔥 Create match
+    const match = await Match.create({
+      users: [like.fromUser, like.toUser]
+    });
+
+    res.status(200).json({
+      message: "Match created successfully",
+      match
+    });
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Server error"
+    });
+  }
+};
+
+
+
+exports.rejectLike = async (req, res) => {
+  try {
+    const likeId = req.params.id;
+    const userId = req.user.id;
+
+    const like = await Like.findById(likeId);
+
+    if (!like) {
+      return res.status(404).json({
+        message: "Request not found"
+      });
+    }
+
+    if (like.toUser.toString() !== userId) {
+      return res.status(403).json({
+        message: "Not authorized"
+      });
+    }
+
+    if (like.status !== "pending") {
+      return res.status(400).json({
+        message: "Already handled"
+      });
+    }
+
+    like.status = "rejected";
+    await like.save();
+
+    res.status(200).json({
+      message: "Request rejected"
     });
 
   } catch (error) {

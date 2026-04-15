@@ -5,6 +5,6 @@
 5. test a profile middleware api ✅
 6. like schema ✅
 7. send like from person A to B and test api ✅
-8. view req by B from A 
-9. accept like notify A & B
+8. view req by B from A api
+9. accept like notify A & B api
 10. reject like dont notify 

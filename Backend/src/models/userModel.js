@@ -6,6 +6,7 @@ const userSchema =new mongoose.Schema({
     type : String ,
     unique : true,
     index : true,
+    sparse : true,
     match : [/^[6-9]\d{9}$/,"please enter a valid phone number"]
    },
 

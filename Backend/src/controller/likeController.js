@@ -1,6 +1,7 @@
 const Like = require("../models/likeModel");
 const User = require("../models/userModel");
 
+
 exports.sendLike = async (req, res) => {
   try {
     const fromUserId = req.user.id;
@@ -78,6 +79,32 @@ exports.sendLike = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json({
+      message: "Server error"
+    });
+  }
+};
+
+
+
+exports.getRequests = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const requests = await Like.find({
+      toUser: userId,
+      status: "pending"
+    })
+    .populate("fromUser", "name photos bio")
+    .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      count: requests.length,
+      requests
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
       message: "Server error"
     });
   }

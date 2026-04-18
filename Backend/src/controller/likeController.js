@@ -4,6 +4,8 @@ const Match = require("../models/matchModel");
 
 
 exports.sendLike = async (req, res) => {
+//   console.log("BODY:", req.body);
+// console.log("HEADERS:", req.headers);
   try {
     const fromUserId = req.user.id;
     const toUserId = req.params.userId;

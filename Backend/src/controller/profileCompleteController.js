@@ -3,7 +3,7 @@ const User = require("../models/userModel")
 
 exports.completeProfile= async (req,res) => {
     try {
-        const userId = req.userId
+        const userId = req.user.id
 
         const {
             name ,

@@ -11,14 +11,14 @@ exports.sendLike = async (req, res) => {
     const toUserId = req.params.userId;
     const { message } = req.body;
 
-    // 🚫 cannot like yourself
+
     if (fromUserId === toUserId) {
       return res.status(400).json({
         message: "You cannot like yourself"
       });
     }
 
-    // ✅ check receiver exists
+  
     const toUser = await User.findById(toUserId);
     if (!toUser) {
       return res.status(404).json({
@@ -100,14 +100,14 @@ exports.getRequests = async (req, res) => {
     .populate("fromUser", "name photos bio")
     .sort({ createdAt: -1 });
 
-    res.status(200).json({
+    return res.status(200).json({
       count: requests.length,
       requests
     });
 
   } catch (error) {
     console.log(error);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Server error"
     });
   }
@@ -151,7 +151,7 @@ exports.acceptLike = async (req, res) => {
       users: [like.fromUser, like.toUser]
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Match created successfully",
       match
     });
@@ -194,13 +194,13 @@ exports.rejectLike = async (req, res) => {
     like.status = "rejected";
     await like.save();
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Request rejected"
     });
 
   } catch (error) {
     console.log(error);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Server error"
     });
   }

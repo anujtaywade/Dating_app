@@ -15,6 +15,7 @@ connectDB();
 app.use('/auth',require("./src/routes/authRoute"))
 app.use('/',require("./src/routes/profileRoute"))
 app.use('/',require("./src/routes/likeRoute"))
+app.use('/matches',require("./src/routes/matchRoute"))
 
 app.listen(port,()=>{
     console.log(`Dating app running on http://localhost:${port}/` )

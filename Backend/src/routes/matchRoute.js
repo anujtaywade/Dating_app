@@ -6,3 +6,5 @@ const { protect } = require('../middleware/authMiddleware')
 
 router.get('/',protect,completeProfile,getMatches)
 router.delete('/:id',protect,completeProfile,unmatch)
+
+module.exports = router

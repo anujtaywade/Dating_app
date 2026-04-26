@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
+const jwtConfig = require('../config/jwt')
 const { json } = require("express");
 
 exports.login = async (req, res) => {
@@ -44,7 +45,7 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       { id: authUser._id },
       process.env.JWT_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: jwtConfig.jwtExpire }
     );
 
     res.status(200).json({

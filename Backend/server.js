@@ -1,25 +1,35 @@
 require('dotenv').config();
-const mongoose = require('mongoose')
-const connectDB = require('./src/config/db')
+const express = require('express');
+const http = require('http');
 
-const express = require('express')
-const app = express()
-port = 2000
+const connectDB = require('./src/config/db');
+const { initSocket } = require('./src/socket/socket');
 
-app.get("/",(req,res)=>{
-    res.send("Dating app backend running!")
-})
+const app = express();
+const port = 2000;
+
 
 app.use(express.json());
 
-app.use('/auth',require("./src/routes/authRoute"))
-app.use('/',require("./src/routes/profileRoute"))
-app.use('/',require("./src/routes/likeRoute"))
-app.use('/matches',require("./src/routes/matchRoute"))
-app.use('/',require('./src/routes/chatRoute'))
 
-// app.listen(port,()=>{
-//     console.log(`Dating app running on http://localhost:${port}/` )
-// })
+app.use('/auth', require("./src/routes/authRoute"));
+app.use('/', require("./src/routes/profileRoute"));
+app.use('/', require("./src/routes/likeRoute"));
+app.use('/matches', require("./src/routes/matchRoute"));
+app.use('/', require('./src/routes/chatRoute'));
 
-connectDB(app,port);
+app.get("/", (req, res) => {
+  res.send("Dating app backend running!");
+});
+
+const server = http.createServer(app);
+
+
+initSocket(server);
+
+
+connectDB().then(() => {
+  server.listen(port, () => {
+    console.log(`Dating app running on http://localhost:${port}/`);
+  });
+});

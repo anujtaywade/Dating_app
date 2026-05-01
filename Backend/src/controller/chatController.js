@@ -21,7 +21,6 @@ exports.sendMessage = async (req, res) => {
       });
     }
 
-    // ✅ verify user is part of match
     const isUserInMatch = match.users.some(
       (id) => id.toString() === userId
     );
@@ -38,7 +37,7 @@ exports.sendMessage = async (req, res) => {
       text
     });
 
-    // 🔥 update last message (for match list UI)
+
     match.lastMessage = text;
     await match.save();
 

@@ -19,6 +19,8 @@ app.use('/matches', require("./src/routes/matchRoute"));
 app.use('/', require('./src/routes/chatRoute'));
 app.use('/',require('./src/routes/discoverRoute'))
 app.use('',require('./src/routes/skipUserRoute'))
+app.use('',require('./src/routes/blockRoute'))
+app.use('',require('./src/routes/reportRoute'))
 
 app.get("/", (req, res) => {
   res.send("Dating app backend running!");

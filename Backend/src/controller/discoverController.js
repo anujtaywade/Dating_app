@@ -2,6 +2,8 @@ const User = require("../models/userModel");
 const Like = require("../models/likeModel");
 const Match = require("../models/matchModel");
 const Skip = require("../models/skipModel")
+const Block = require("../models/blockModel");
+
 
 exports.getDiscoverUsers = async (req, res) => {
   try {
@@ -35,17 +37,29 @@ exports.getDiscoverUsers = async (req, res) => {
     const likes = await Like.find({ fromUser: userId });
     const matches = await Match.find({ users: userId });
     const skips = await Skip.find({ fromUser: userId });
+    const blocks = await Block.find({$or: [
+    { blocker: userId },
+    { blocked: userId }
+  ]
+});
 
     const likedUserIds = likes.map(l => l.toUser.toString());
     const matchedUserIds = matches.flatMap(m =>
       m.users.map(u => u.toString()));
     const skippedIds = skips.map(s => s.toUser.toString());
+    const blockedIds = blocks.map(b =>
+  b.blocker.toString() === userId
+    ? b.blocked.toString()
+    : b.blocker.toString()
+);
+    
 
     const excludeIds = [
       userId,
       ...likedUserIds,
       ...matchedUserIds,
       ...skippedIds,
+      ...blockedIds,
     ];
 
     // 🎯 Fetch users

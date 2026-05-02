@@ -1,12 +1,19 @@
 const User = require("../models/userModel");
 const Like = require("../models/likeModel");
 const Match = require("../models/matchModel");
+const Skip = require("../models/skipModel")
 
 exports.getDiscoverUsers = async (req, res) => {
   try {
     const userId = req.user.id;
 
     const currentUser = await User.findById(userId);
+
+    if (!currentUser.location || !currentUser.location.coordinates) {
+  return res.status(400).json({
+    message: "Please update your location"
+  });
+}
 
     // 🧠 DAILY LIMIT (10 users/day)
     const today = new Date().toDateString();
@@ -27,16 +34,18 @@ exports.getDiscoverUsers = async (req, res) => {
     // 🔍 Get exclusions
     const likes = await Like.find({ fromUser: userId });
     const matches = await Match.find({ users: userId });
+    const skips = await Skip.find({ fromUser: userId });
 
     const likedUserIds = likes.map(l => l.toUser.toString());
     const matchedUserIds = matches.flatMap(m =>
-      m.users.map(u => u.toString())
-    );
+      m.users.map(u => u.toString()));
+    const skippedIds = skips.map(s => s.toUser.toString());
 
     const excludeIds = [
       userId,
       ...likedUserIds,
-      ...matchedUserIds
+      ...matchedUserIds,
+      ...skippedIds,
     ];
 
     // 🎯 Fetch users

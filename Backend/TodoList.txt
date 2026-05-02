@@ -16,3 +16,4 @@
 16. implement socket.io for real time chating (backend) ✅ 
 17. discover feed controller route created tested✅
 18 . Test the discover feed api 
+19. User should give location request or else curruser.location will fail

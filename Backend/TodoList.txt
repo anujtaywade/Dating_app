@@ -15,5 +15,11 @@
 15. tested the chat system and apis ✅
 16. implement socket.io for real time chating (backend) ✅ 
 17. discover feed controller route created tested✅
-18 . Test the discover feed api 
-19. User should give location request or else curruser.location will fail
+18 . Test the discover feed api ✅
+19.  NOTE :  User should give location request or else curruser.location will fail
+20. create report and block apis and controller ✅
+21 . Tested report and block apis ✅
+22 . skip user schema,controller,route created and tested✅
+23. added a ratelimitmiddleware to limit likes and removed logic from controller ✅
+24. Limit of 10 user like not tested 
+25. major bug fix section do but not test the backend MVP after bug fix 

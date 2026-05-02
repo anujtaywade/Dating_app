@@ -25,9 +25,9 @@ exports.rateLimitLikes = async (req, res, next) => {
     }
 
     // ✅ increment count
-    user.likesSentToday += 1;
-    user.lastLikeDate = new Date();
-    await user.save();
+    //  user.likesSentToday += 1;
+    // user.lastLikeDate = new Date();
+    // await user.save();
 
     next();
 

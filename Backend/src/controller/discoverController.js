@@ -67,8 +67,8 @@ exports.getDiscoverUsers = async (req, res) => {
       _id: { $nin: excludeIds },
       profileCompleted: true,
 
-      gender: currentUser.interestedIn,
-      interestedIn: currentUser.gender,
+      gender: currentUser.intrestedIn,
+      intrestedIn: currentUser.gender,
 
     location: {
     $near: {

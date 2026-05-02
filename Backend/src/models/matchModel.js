@@ -8,10 +8,20 @@ const matchSchema = new mongoose.Schema({
     }
   ],
 
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
+  // createdAt: {
+  //   type: Date,
+  //   default: Date.now
+  // },
+
+   lastMessage: {
+      type: String,
+      default: ""
+    },
+
+    lastMessageAt: {
+      type: Date
+    },
+
 
   isActive: {
     type: Boolean,

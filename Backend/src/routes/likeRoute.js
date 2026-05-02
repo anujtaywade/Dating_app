@@ -2,8 +2,9 @@ const router = require('express').Router()
 const { protect } = require('../middleware/authMiddleware');
 const { profileCompleteCheck } = require('../middleware/profileMiddleware');
 const {sendLike ,getRequests, acceptLike , rejectLike} = require('../controller/likeController')
+const {rateLimitLikes} = require("../middleware/rateLimitMiddleware")
 
-router.post('/sendLikes/:userId',protect,profileCompleteCheck,sendLike)
+router.post('/sendLikes/:userId',protect,profileCompleteCheck,rateLimitLikes,sendLike)
 router.get('/likes/requests',protect,profileCompleteCheck, getRequests)
 router.post('/likes/accept/:id',protect , profileCompleteCheck, acceptLike)
 router.post('/likes/reject/:id',protect , profileCompleteCheck, rejectLike)

@@ -39,6 +39,7 @@ exports.sendMessage = async (req, res) => {
 
 
     match.lastMessage = text;
+    match.lastMessageAt = new Date();
     await match.save();
 
     res.status(201).json({

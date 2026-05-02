@@ -24,14 +24,10 @@ const likeSchema = new mongoose.Schema({
     default: "pending"
   },
 
-  likesSentToday: {
-  type: Number,
-  default: 0
-},
-lastLikeDate: {
-  type: Date
-}
+
 
 }, { timestamps: true });
+
+likeSchema.index({ fromUser: 1, toUser: 1 }, { unique: true });
 
 module.exports = mongoose.model("Like", likeSchema);

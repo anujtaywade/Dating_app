@@ -11,7 +11,8 @@ exports.completeProfile= async (req,res) => {
             gender,
             intrestedIn,
             bio,
-            photos
+            photos,
+            location
         } = req.body
 
         const user = await User.findById(userId)
@@ -20,24 +21,43 @@ exports.completeProfile= async (req,res) => {
             return res.status(404).json({message : "User not found"})
         }
 
-        user.name = name || user.name
-        user.dob = dob || user.dob 
-        user.gender = gender || user.gender
-        user.intrestedIn = intrestedIn || user.intrestedIn
-        user.bio = bio || user.bio 
-        user.photos = photos || user.photos 
-        
+         if (location) {
         if (
-            user.name &&
-            user.dob &&
-            user.gender && 
-            user.intrestedIn &&
-            user.bio && 
-            user.photos && 
-            user.photos.length > 0 
+          !Array.isArray(location.coordinates) ||
+          location.coordinates.length !== 2
         ) {
-            user.profileCompleted = true ;
+          return res.status(400).json({
+            message: "Location coordinates must be [longitude, latitude]"
+          });
         }
+
+        user.location = {
+          type: "Point",
+          coordinates: location.coordinates,
+          city: location.city || user.location?.city
+        };
+      }
+
+
+      if (name !== undefined) user.name = name;
+      if (dob !== undefined) user.dob = dob;
+      if (gender !== undefined) user.gender = gender;
+      if (intrestedIn !== undefined) user.intrestedIn = intrestedIn;
+      if (bio !== undefined) user.bio = bio;
+      if (photos !== undefined) user.photos = photos;
+        
+       user.profileCompleted = Boolean(
+        user.name &&
+        user.dob &&
+        user.gender &&
+        user.intrestedIn &&
+        user.bio &&
+        Array.isArray(user.photos) &&
+        user.photos.length > 0 &&
+        user.location &&
+        Array.isArray(user.location.coordinates) &&
+        user.location.coordinates.length === 2
+      );
 
         await user.save();
 

@@ -38,31 +38,6 @@ exports.sendLike = async (req, res) => {
       });
     }
 
-    // 🧠 DAILY LIMIT LOGIC
-    const fromUser = await User.findById(fromUserId);
-
-    const today = new Date().toDateString();
-    const lastLikeDay = fromUser.lastLikeDate
-      ? fromUser.lastLikeDate.toDateString()
-      : null;
-
-    // reset if new day
-    if (today !== lastLikeDay) {
-      fromUser.likesSentToday = 0;
-    }
-
-    const DAILY_LIMIT = 10;
-
-    if (fromUser.likesSentToday >= DAILY_LIMIT) {
-      return res.status(429).json({
-        message: "Daily like limit reached"
-      });
-    }
-
-    // increment count
-    fromUser.likesSentToday += 1;
-    fromUser.lastLikeDate = new Date();
-    await fromUser.save();
 
     // ❤️ create like
     const like = await Like.create({
@@ -71,8 +46,11 @@ exports.sendLike = async (req, res) => {
       message
     });
 
-    // 🔔 (optional) notification placeholder
-    // TODO: integrate push notification later
+     await User.findByIdAndUpdate(fromUserId, {
+    $inc: { likesSentToday: 1 },
+    lastLikeDate: new Date()
+    });
+
 
     return res.status(201).json({
       message: "Request sent successfully",
@@ -141,6 +119,17 @@ exports.acceptLike = async (req, res) => {
         message: "Request already handled"
       });
     }
+
+    // prevent duplicate match 
+    const existingMatch = await Match.findOne({
+  users: { $all: [like.fromUser, like.toUser] }
+});
+
+if (existingMatch) {
+  return res.status(400).json({
+    message: "Match already exists"
+  });
+}
 
     // ✅ Accept
     like.status = "accepted";

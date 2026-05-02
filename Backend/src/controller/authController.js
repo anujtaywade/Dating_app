@@ -62,7 +62,7 @@ exports.login = async (req, res) => {
 
 exports.authMe =async (req,res) => {
   try {
-    const currUser = await User.findById(req.userId)
+    const currUser = await User.findById(req.user.id)
 
     if (!currUser){
       return res.status(401).json({message : "User not found"})

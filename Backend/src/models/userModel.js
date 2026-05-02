@@ -38,6 +38,15 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
 
+    likesSentToday: {
+    type: Number,
+    default: 0
+  },
+
+  lastLikeDate: {
+    type: Date
+  },
+
     name: String,
 
     dob: Date,
@@ -55,6 +64,16 @@ const userSchema = new mongoose.Schema(
     bio: String,
 
     photos: [String],
+
+    
+  lastDiscoverDate: {
+    type: Date
+  },
+
+  lastActive: {
+    type: Date,
+    default: Date.now
+  },
 
     location: {
       type: {

@@ -1,10 +1,11 @@
-const router = require('express').Router()
 
-const { getMatches , unmatch} = require('../controller/matchController')
-const { completeProfile } = require('../controller/profileCompleteController')
-const { protect } = require('../middleware/authMiddleware')
+  const router = require("express").Router();
 
-router.get('/',protect,completeProfile,getMatches)
-router.delete('/:id',protect,completeProfile,unmatch)
+  const { getMatches, unmatch } = require("../controller/matchController");
+  const { protect } = require("../middleware/authMiddleware");
+  const { profileCompleteCheck } = require("../middleware/profileMiddleware");
 
-module.exports = router
+  router.get("/", protect, profileCompleteCheck, getMatches);
+  router.delete("/:id", protect, profileCompleteCheck, unmatch);
+
+  module.exports = router;

@@ -42,7 +42,17 @@ exports.getDiscoverUsers = async (req, res) => {
     // 🎯 Fetch users
     let users = await User.find({
       _id: { $nin: excludeIds },
-      profileCompleted: true
+      profileCompleted: true,
+
+      gender: currentUser.interestedIn,
+      interestedIn: currentUser.gender,
+
+    location: {
+    $near: {
+      $geometry: currentUser.location,
+      $maxDistance: 50000 // 50km
+    }
+  }
     }).limit(50);
 
     // 🧠 Ranking logic

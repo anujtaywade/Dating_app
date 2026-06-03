@@ -1,18 +1,5 @@
-import { View, Text } from "react-native";
+import { Redirect } from "expo-router";
 
-export default function Home() {
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "pink",
-      }}
-    >
-      <Text style={{ fontSize: 32, fontWeight: "bold" }}>
-        Shero ❤️
-      </Text>
-    </View>
-  );
+export default function Index() {
+  return <Redirect href="/(auth)/Loginscreen" />;
 }

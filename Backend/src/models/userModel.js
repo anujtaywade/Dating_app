@@ -79,13 +79,19 @@ const userSchema = new mongoose.Schema(
       type: {
         type: String,
         enum: ["Point"],
-        default: "Point",
       },
       coordinates: {
         type: [Number], // [lng, lat]
       },
       city: String,
     },
+
+    firebaseUid: {
+  type: String,
+  unique: true,
+  sparse: true,
+},
+
   },
   { timestamps: true },
 );

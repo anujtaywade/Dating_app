@@ -1,10 +1,5 @@
 import { getApp, getApps, initializeApp } from "firebase/app";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  getAuth,
-  initializeAuth,
-  getReactNativePersistence,
-} from "firebase/auth";
+import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
@@ -15,26 +10,7 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
-console.log(firebaseConfig.projectId);
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-const missingConfig = Object.entries(firebaseConfig)
-  .filter(([, value]) => !value)
-  .map(([key]) => key);
-
-if (__DEV__ && missingConfig.length > 0) {
-  console.warn(
-    `Missing Firebase config value(s): ${missingConfig.join(
-      ", "
-    )}. Add them to .env`
-  );
-}
-
-export const app =
-  getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-
-export const auth =
-  getApps().length > 0
-    ? getAuth(app)
-    : initializeAuth(app, {
-        persistence: getReactNativePersistence(AsyncStorage),
-      });
+export const auth = getAuth(app);
+export { app };

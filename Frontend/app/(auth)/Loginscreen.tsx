@@ -20,6 +20,7 @@ import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
 import { auth } from '@/config/firebase';
 import { useGoogleLogin } from '@/hooks/useGoogleAuth';
 import { loginWithFirebaseToken } from '@/services/authApi';
+import { signInWithPhoneNumber } from "firebase/auth";
 
 
 
@@ -65,6 +66,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [phone, setPhone] = useState<string>('');
   const [focusedField, setFocusedField] = useState<FocusedField>(null);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [confirmation, setConfirmation] = useState(null);
 
   const headerY = useRef(new Animated.Value(-24)).current;
   const headerOpacity = useRef(new Animated.Value(0)).current;
@@ -142,18 +144,41 @@ console.log("ID Token:", idToken);
     completeGoogleLogin();
   }, [googleResponse, router]);
 
-  const handleLogin = (): void => {
-    Animated.sequence([
-      Animated.timing(btnScale, { toValue: 0.96, duration: 80, useNativeDriver: true }),
-      Animated.spring(btnScale, { toValue: 1, tension: 200, friction: 5, useNativeDriver: true }),
-    ]).start(() => {
-      Alert.alert(
-        'Phone OTP is not connected yet',
-        'Firebase phone auth for Expo native needs reCAPTCHA/native setup. Use Google sign in for the Firebase flow, or add the phone auth provider setup next.'
-      );
-      console.log('Login pressed', { phone });
+ const handleLogin = async () => {
+  try {
+    const fullPhone = "+91" + phone;
+
+    const res = await fetch(
+      `https://identitytoolkit.googleapis.com/v1/accounts:sendVerificationCode?key=${process.env.EXPO_PUBLIC_FIREBASE_API_KEY}`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          phoneNumber: fullPhone,
+          recaptchaToken: "ignored"
+        }),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    const data = await res.json();
+
+    console.log("OTP SENT:", data);
+
+    router.push({
+      pathname: "/(auth)/Otpverifyscreen",
+      params: {
+        sessionInfo: data.sessionInfo,
+        phone: fullPhone
+      }
     });
-  };
+
+  } catch (err) {
+    console.log(err);
+    Alert.alert("OTP send failed");
+  }
+};
 
   const handleGoogleLogin = async (): Promise<void> => {
     try {

@@ -14,6 +14,15 @@ import {
   TextInputKeyPressEventData,
 } from 'react-native';
 
+import { PhoneAuthProvider, signInWithCredential } from "firebase/auth";
+import { auth } from "@/config/firebase";
+import { loginWithFirebaseToken } from "@/services/authApi";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import { Alert } from "react-native";
+
+
+
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface OtpVerifyScreenProps {
   navigation?: { navigate: (screen: string) => void; goBack: () => void };
@@ -146,15 +155,15 @@ const OtpBox: React.FC<OtpBoxProps> = ({ value, isFocused, isError, index, entry
 // ─── Main ─────────────────────────────────────────────────────────────────────
 const OtpVerifyScreen: React.FC<OtpVerifyScreenProps> = ({ navigation, route }) => {
   const { width, height } = useWindowDimensions();
-  const phone = route?.params?.phone ?? '98765 43210';
-
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(''));
-  const [focusedIndex, setFocusedIndex] = useState<number>(0);
+ const [focusedIndex, setFocusedIndex] = useState<number | null>(0);
   const [isError, setIsError] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number>(RESEND_COUNTDOWN);
   const [canResend, setCanResend] = useState<boolean>(false);
-
+  const router = useRouter();
+const { verificationId, phone: phoneParam } = useLocalSearchParams();
+const phoneNumber = Array.isArray(phoneParam) ? phoneParam[0] : phoneParam ?? '';
   const inputRefs = useRef<(TextInput | null)[]>(Array(OTP_LENGTH).fill(null));
   const btnScale = useRef(new Animated.Value(1)).current;
   const successScale = useRef(new Animated.Value(0)).current;
@@ -229,31 +238,30 @@ const OtpVerifyScreen: React.FC<OtpVerifyScreenProps> = ({ navigation, route }) 
     [otp]
   );
 
-  const handleVerify = (): void => {
-    const filled = otp.every(d => d !== '');
-    if (!filled) {
-      setIsError(true);
-      Animated.sequence([
-        Animated.timing(btnScale, { toValue: 0.96, duration: 80, useNativeDriver: true }),
-        Animated.spring(btnScale, { toValue: 1, tension: 200, friction: 5, useNativeDriver: true }),
-      ]).start();
-      return;
-    }
+  const handleVerify = async () => {
+  try {
+    const code = otp.join("");
 
-    Animated.sequence([
-      Animated.timing(btnScale, { toValue: 0.96, duration: 80, useNativeDriver: true }),
-      Animated.spring(btnScale, { toValue: 1, tension: 200, friction: 5, useNativeDriver: true }),
-    ]).start(() => {
-      setIsSuccess(true);
-      Animated.parallel([
-        Animated.spring(successScale, { toValue: 1, tension: 60, friction: 8, useNativeDriver: true }),
-        Animated.timing(successOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
-      ]).start(() => {
-        // navigation?.navigate('Home');
-        console.log('OTP verified:', otp.join(''));
-      });
-    });
-  };
+    const credential = PhoneAuthProvider.credential(
+      verificationId as string,
+      code
+    );
+
+    const userCredential = await signInWithCredential(auth, credential);
+
+    const firebaseToken = await userCredential.user.getIdToken();
+
+    const res = await loginWithFirebaseToken(firebaseToken);
+
+    console.log("LOGIN SUCCESS", res);
+
+    router.replace("/(tabs)");
+  } catch (err) {
+    console.log(err);
+    setIsError(true);
+    Alert.alert("Invalid OTP");
+  }
+};
 
   const handleResend = (): void => {
     if (!canResend) return;
@@ -308,7 +316,7 @@ const OtpVerifyScreen: React.FC<OtpVerifyScreenProps> = ({ navigation, route }) 
           <Text style={[styles.heading, { fontSize: isSmall ? 22 : 26 }]}>Verify your number</Text>
           <Text style={styles.subheading}>
             We sent a 6-digit code to{'\n'}
-            <Text style={styles.phoneHighlight}>+91 {phone}</Text>
+            <Text style={styles.phoneHighlight}>+91 {phoneNumber}</Text>
           </Text>
         </Animated.View>
 
@@ -334,7 +342,7 @@ const OtpVerifyScreen: React.FC<OtpVerifyScreenProps> = ({ navigation, route }) 
                   onChangeText={text => handleChange(text, i)}
                   onKeyPress={e => handleKeyPress(e, i)}
                   onFocus={() => setFocusedIndex(i)}
-                  onBlur={() => setFocusedIndex(-1)}
+                  onBlur={() => setFocusedIndex(null)}
                   keyboardType="number-pad"
                   maxLength={1}
                   caretHidden

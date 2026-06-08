@@ -1,26 +1,30 @@
 require('dotenv').config();
 const express = require('express');
 const http = require('http');
-
+const cors = require('cors')
 const connectDB = require('./src/config/db');
 const { initSocket } = require('./src/socket/socket');
-
 const app = express();
 const port = process.env.PORT ||3000;
 
 
+
+
+app.use(cors({
+  origin: "http://localhost:8081",
+  credentials: true
+}));
 app.use(express.json());
 
-
-app.use('/', require("./src/routes/authRoute"));
-app.use('/', require("./src/routes/profileRoute"));
-app.use('/', require("./src/routes/likeRoute"));
+app.use('/auth', require("./src/routes/authRoute"));
+app.use('/profile', require("./src/routes/profileRoute"));
+app.use('/like', require("./src/routes/likeRoute"));
 app.use('/matches', require("./src/routes/matchRoute"));
-app.use('/', require('./src/routes/chatRoute'));
-app.use('/',require('./src/routes/discoverRoute'))
-app.use('',require('./src/routes/skipUserRoute'))
-app.use('',require('./src/routes/blockRoute'))
-app.use('',require('./src/routes/reportRoute'))
+app.use('/chat', require('./src/routes/chatRoute'));
+app.use('/discover',require('./src/routes/discoverRoute'))
+app.use('/skip',require('./src/routes/skipUserRoute'))
+app.use('/block',require('./src/routes/blockRoute'))
+app.use('/report',require('./src/routes/reportRoute'))
 app.use("/auth", require("./src/routes/firebaseAuthRoute"));
 
 app.get("/", (req, res) => {

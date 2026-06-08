@@ -1,18 +1,27 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
+  ActivityIndicator,
+  Alert,
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
   Animated,
-  Dimensions,
   KeyboardAvoidingView,
   Platform,
   StatusBar,
   ScrollView,
   useWindowDimensions,
 } from 'react-native';
+
+import { useRouter } from 'expo-router';
+import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
+import { auth } from '@/config/firebase';
+import { useGoogleLogin } from '@/hooks/useGoogleAuth';
+import { loginWithFirebaseToken } from '@/services/authApi';
+
+
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface LoginScreenProps {
@@ -37,7 +46,7 @@ const Dot: React.FC<DotProps> = ({ x, y, delay }) => {
     );
     anim.start();
     return () => anim.stop();
-  }, []);
+  }, [delay, opacity]);
   return (
     <Animated.View style={{
       position: 'absolute', left: x, top: y,
@@ -50,9 +59,12 @@ const Dot: React.FC<DotProps> = ({ x, y, delay }) => {
 // ─── Main ─────────────────────────────────────────────────────────────────────
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const { width, height } = useWindowDimensions();
+  const router = useRouter();
+  const [, googleResponse, promptGoogleLogin] = useGoogleLogin();
 
   const [phone, setPhone] = useState<string>('');
   const [focusedField, setFocusedField] = useState<FocusedField>(null);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const headerY = useRef(new Animated.Value(-24)).current;
   const headerOpacity = useRef(new Animated.Value(0)).current;
@@ -71,16 +83,89 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         Animated.timing(formOpacity, { toValue: 1, duration: 480, useNativeDriver: true }),
       ]),
     ]).start();
-  }, []);
+  }, [formOpacity, formY, headerOpacity, headerY]);
+
+  useEffect(() => {
+    const completeGoogleLogin = async () => {
+
+       console.log("Google Response:", googleResponse);
+
+      if (googleResponse?.type !== 'success') {
+        return;
+      }
+
+      const idToken =
+        googleResponse.authentication?.idToken || googleResponse.params?.id_token;
+
+        console.log("Google Params:", googleResponse.params);
+console.log("ID Token:", idToken);
+
+      if (!idToken) {
+        Alert.alert('Google sign in failed', 'Google did not return an ID token.');
+        setIsGoogleLoading(false);
+        return;
+      }
+
+      try {
+  console.log("🔥 Step 1: Firebase credential create");
+
+  const credential = GoogleAuthProvider.credential(idToken);
+
+  const userCredential = await signInWithCredential(auth, credential);
+
+  console.log("🔥 Step 2: Firebase sign-in success");
+
+  const firebaseToken = await userCredential.user.getIdToken();
+
+  console.log("🔥 Step 3: Firebase token received");
+
+  const res = await loginWithFirebaseToken(firebaseToken);
+
+  console.log("🔥 Step 4: Backend response:", res);
+
+  if (!res?.success) {
+    throw new Error("Backend login failed");
+  }
+
+  router.replace('/(tabs)');
+} catch (error) {
+  Alert.alert(
+    'Google sign in failed',
+    error instanceof Error ? error.message : 'Please try again.'
+  );
+  console.error("❌ Full auth error:", error);
+} finally {
+  setIsGoogleLoading(false);
+}
+    };
+
+    completeGoogleLogin();
+  }, [googleResponse, router]);
 
   const handleLogin = (): void => {
     Animated.sequence([
       Animated.timing(btnScale, { toValue: 0.96, duration: 80, useNativeDriver: true }),
       Animated.spring(btnScale, { toValue: 1, tension: 200, friction: 5, useNativeDriver: true }),
     ]).start(() => {
-      // navigation?.navigate('Home');
+      Alert.alert(
+        'Phone OTP is not connected yet',
+        'Firebase phone auth for Expo native needs reCAPTCHA/native setup. Use Google sign in for the Firebase flow, or add the phone auth provider setup next.'
+      );
       console.log('Login pressed', { phone });
     });
+  };
+
+  const handleGoogleLogin = async (): Promise<void> => {
+    try {
+      setIsGoogleLoading(true);
+      await promptGoogleLogin();
+    } catch (error) {
+      setIsGoogleLoading(false);
+      Alert.alert(
+        'Google sign in failed',
+        error instanceof Error ? error.message : 'Please try again.'
+      );
+    }
   };
 
   // Responsive sizing
@@ -170,11 +255,20 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           </View>
 
           {/* Google */}
-          <TouchableOpacity style={styles.googleBtn} activeOpacity={0.85}>
+          <TouchableOpacity
+            style={styles.googleBtn}
+            activeOpacity={0.85}
+            disabled={isGoogleLoading}
+            onPress={handleGoogleLogin}
+          >
             <View style={styles.googleIconWrap}>
               <Text style={styles.googleIcon}>G</Text>
             </View>
-            <Text style={styles.googleLabel}>Continue with Google</Text>
+            {isGoogleLoading ? (
+              <ActivityIndicator color="#4a2c10" />
+            ) : (
+              <Text style={styles.googleLabel}>Continue with Google</Text>
+            )}
           </TouchableOpacity>
 
         </Animated.View>

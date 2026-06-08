@@ -6,9 +6,19 @@ exports.firebaseLogin = async (req, res) => {
   try {
     const { firebaseToken } = req.body;
 
-    const decoded = await admin
-      .auth()
-      .verifyIdToken(firebaseToken);
+    if (!firebaseToken) {
+      return res.status(400).json({
+        message: "firebaseToken is required",
+      });
+    }
+
+    if (!process.env.JWT_SECRET) {
+      return res.status(500).json({
+        message: "JWT_SECRET is not configured",
+      });
+    }
+
+    const decoded = await admin.auth().verifyIdToken(firebaseToken);
 
     const uid = decoded.uid;
 
@@ -16,25 +26,25 @@ exports.firebaseLogin = async (req, res) => {
       firebaseUid: uid,
     });
 
-    if (!user) {
-      user = await User.create({
-        firebaseUid: uid,
-        phone: decoded.phone_number,
-        email: decoded.email,
-        authProvider: decoded.phone_number
-          ? "phone"
-          : "google",
-        isVerified: true,
-      });
-    }
+  if (!user) {
+  const userData = {
+    firebaseUid: uid,
+    email: decoded.email,
+    authProvider: decoded.phone_number ? "phone" : "google",
+    isVerified: true,
+  };
 
-    const token = jwt.sign(
-      { id: user._id },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "7d",
-      }
-    );
+  // ONLY add phone if it exists
+  if (decoded.phone_number) {
+    userData.phone = decoded.phone_number;
+  }
+
+  user = await User.create(userData);
+}
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
     res.json({
       success: true,

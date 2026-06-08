@@ -1,3 +1,5 @@
+console.log("LoginScreen rendering");
+
 import React, { useState, useRef, useEffect } from 'react';
 import {
   ActivityIndicator,

@@ -1,3 +1,5 @@
+console.log("OtpVerifyScreen rendering");
+
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   View,
@@ -153,6 +155,7 @@ const OtpBox: React.FC<OtpBoxProps> = ({ value, isFocused, isError, index, entry
 };
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
+
 const OtpVerifyScreen: React.FC<OtpVerifyScreenProps> = ({ navigation, route }) => {
   const { width, height } = useWindowDimensions();
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(''));
@@ -162,7 +165,12 @@ const OtpVerifyScreen: React.FC<OtpVerifyScreenProps> = ({ navigation, route }) 
   const [countdown, setCountdown] = useState<number>(RESEND_COUNTDOWN);
   const [canResend, setCanResend] = useState<boolean>(false);
   const router = useRouter();
-const { verificationId, phone: phoneParam } = useLocalSearchParams();
+const { sessionInfo, phone: phoneParam } = useLocalSearchParams();
+
+console.log("OTP SCREEN OPENED");
+console.log("sessionInfo:", sessionInfo);
+console.log("phone:", phoneParam);
+
 const phoneNumber = Array.isArray(phoneParam) ? phoneParam[0] : phoneParam ?? '';
   const inputRefs = useRef<(TextInput | null)[]>(Array(OTP_LENGTH).fill(null));
   const btnScale = useRef(new Animated.Value(1)).current;
@@ -243,13 +251,15 @@ const phoneNumber = Array.isArray(phoneParam) ? phoneParam[0] : phoneParam ?? ''
     const code = otp.join("");
 
     const credential = PhoneAuthProvider.credential(
-      verificationId as string,
+      sessionInfo as string,
       code
     );
 
     const userCredential = await signInWithCredential(auth, credential);
 
     const firebaseToken = await userCredential.user.getIdToken();
+
+    console.log("FIREBASE TOKEN:", firebaseToken);
 
     const res = await loginWithFirebaseToken(firebaseToken);
 
@@ -294,7 +304,7 @@ const phoneNumber = Array.isArray(phoneParam) ? phoneParam[0] : phoneParam ?? ''
       {/* Back button */}
       <TouchableOpacity
         style={[styles.backBtn, { top: cardPaddingTop - 8 }]}
-        onPress={() => navigation?.goBack()}
+        onPress={() => router.back()}
         activeOpacity={0.7}
       >
         <Text style={styles.backIcon}>←</Text>

@@ -12,8 +12,20 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.anujtaywade.offcampus" ,
-      "googleServicesFile": "./google-services.json", 
+      "package": "com.anujtaywade.offcampus",
+      "googleServicesFile": "./google-services.json",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "com.anujtaywade.offcampus"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -46,6 +58,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "5379c272-b831-49c4-94c3-973347d8b99f"
+      }
     }
   }
 }

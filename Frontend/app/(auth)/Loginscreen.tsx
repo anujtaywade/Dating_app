@@ -63,7 +63,7 @@ const Dot: React.FC<DotProps> = ({ x, y, delay }) => {
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const { width, height } = useWindowDimensions();
   const router = useRouter();
-  const [, googleResponse, promptGoogleLogin] = useGoogleLogin();
+  const [googleRequest, googleResponse, promptGoogleLogin] = useGoogleLogin();
 
   const [phone, setPhone] = useState<string>('');
   const [focusedField, setFocusedField] = useState<FocusedField>(null);
@@ -92,8 +92,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   useEffect(() => {
     const completeGoogleLogin = async () => {
 
-       console.log("Google Response:", googleResponse);
-
+       console.log("Google Response:", JSON.stringify(googleResponse));
+      
       if (googleResponse?.type !== 'success') {
         return;
       }
@@ -183,17 +183,22 @@ console.log("ID Token:", idToken);
 };
 
   const handleGoogleLogin = async (): Promise<void> => {
-    try {
-      setIsGoogleLoading(true);
-      await promptGoogleLogin();
-    } catch (error) {
-      setIsGoogleLoading(false);
-      Alert.alert(
-        'Google sign in failed',
-        error instanceof Error ? error.message : 'Please try again.'
-      );
+  try {
+    console.log("REQUEST BEFORE PROMPT:", googleRequest);
+    if (!googleRequest) {
+      Alert.alert('Not ready', 'Google login not initialized yet');
+      return;
     }
-  };
+    setIsGoogleLoading(true);
+    await promptGoogleLogin();
+  } catch (error) {
+    setIsGoogleLoading(false);
+    Alert.alert(
+      'Google sign in failed',
+      error instanceof Error ? error.message : 'Please try again.'
+    );
+  }
+};
 
   // Responsive sizing
   const isSmall = height < 680;

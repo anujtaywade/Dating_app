@@ -20,7 +20,8 @@
           "autoVerify": true,
           "data": [
             {
-              "scheme": "com.anujtaywade.offcampus"
+              "scheme": "com.anujtaywade.offcampus",
+              "host": "oauthredirect"
             }
           ],
           "category": ["BROWSABLE", "DEFAULT"]

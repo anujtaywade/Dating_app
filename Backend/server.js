@@ -6,12 +6,16 @@ const connectDB = require('./src/config/db');
 const { initSocket } = require('./src/socket/socket');
 const app = express();
 const port = process.env.PORT ||3000;
+const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:8081")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
 
 
 
 app.use(cors({
-  origin: "http://localhost:8081",
+  origin: allowedOrigins,
   credentials: true
 }));
 app.use(express.json());

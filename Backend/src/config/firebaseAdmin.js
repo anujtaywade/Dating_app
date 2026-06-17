@@ -1,5 +1,13 @@
 const admin = require("firebase-admin");
-const serviceAccount = require("../../crosscampus-e184f-firebase-adminsdk-fbsvc-6405a805f4.json"); // adjust path if needed
+const path = require("path");
+
+const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH;
+
+if (!serviceAccountPath) {
+  throw new Error("FIREBASE_SERVICE_ACCOUNT_PATH is not configured");
+}
+
+const serviceAccount = require(path.resolve(__dirname, "../../", serviceAccountPath));
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),

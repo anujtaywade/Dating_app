@@ -6,8 +6,6 @@ exports.firebaseLogin = async (req, res) => {
   try {
     const { firebaseToken } = req.body;
 
-     console.log("TOKEN RECEIVED:", firebaseToken);
-
     if (!firebaseToken) {
       return res.status(400).json({
         message: "firebaseToken is required",
@@ -21,8 +19,6 @@ exports.firebaseLogin = async (req, res) => {
     }
 
     const decoded = await admin.auth().verifyIdToken(firebaseToken);
-
-    console.log("DECODED:", decoded);
 
     const uid = decoded.uid;
 
@@ -57,7 +53,7 @@ exports.firebaseLogin = async (req, res) => {
     });
   } catch (error) {
       console.log("========== FIREBASE ERROR ==========");
-  console.log(error);
+  console.log(error?.message || error);
   console.log("===================================");
     res.status(401).json({
       message: "Invalid Firebase Token",

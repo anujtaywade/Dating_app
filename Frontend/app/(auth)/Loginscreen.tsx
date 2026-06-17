@@ -1,5 +1,3 @@
-console.log("LoginScreen rendering");
-
 import React, { useState, useRef, useEffect } from 'react';
 import {
   ActivityIndicator,
@@ -22,7 +20,6 @@ import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
 import { auth } from '@/config/firebase';
 import { useGoogleLogin } from '@/hooks/useGoogleAuth';
 import { loginWithFirebaseToken } from '@/services/authApi';
-import { signInWithPhoneNumber } from "firebase/auth";
 
 
 
@@ -60,7 +57,7 @@ const Dot: React.FC<DotProps> = ({ x, y, delay }) => {
 };
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
-const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
+const LoginScreen: React.FC<LoginScreenProps> = () => {
   const { width, height } = useWindowDimensions();
   const router = useRouter();
   const [googleRequest, googleResponse, promptGoogleLogin] = useGoogleLogin();
@@ -68,7 +65,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [phone, setPhone] = useState<string>('');
   const [focusedField, setFocusedField] = useState<FocusedField>(null);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [confirmation, setConfirmation] = useState(null);
 
   const headerY = useRef(new Animated.Value(-24)).current;
   const headerOpacity = useRef(new Animated.Value(0)).current;
@@ -92,40 +88,40 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   useEffect(() => {
     const completeGoogleLogin = async () => {
 
-       console.log("Google Response:", JSON.stringify(googleResponse));
-      
-      if (googleResponse?.type !== 'success') {
+      if (!googleResponse) {
+        return;
+      }
+
+      if (googleResponse.type !== 'success') {
+        setIsGoogleLoading(false);
+        if (googleResponse.type === 'error') {
+          Alert.alert(
+            'Google sign in failed',
+            googleResponse.error?.message || googleResponse.errorCode || 'Please try again.'
+          );
+        }
         return;
       }
 
       const idToken =
         googleResponse.authentication?.idToken || googleResponse.params?.id_token;
+      const accessToken =
+        googleResponse.authentication?.accessToken || googleResponse.params?.access_token;
 
-        console.log("Google Params:", googleResponse.params);
-console.log("ID Token:", idToken);
-
-      if (!idToken) {
-        Alert.alert('Google sign in failed', 'Google did not return an ID token.');
+      if (!idToken && !accessToken) {
+        Alert.alert('Google sign in failed', 'Google did not return a usable token.');
         setIsGoogleLoading(false);
         return;
       }
 
       try {
-  console.log("🔥 Step 1: Firebase credential create");
-
-  const credential = GoogleAuthProvider.credential(idToken);
+  const credential = GoogleAuthProvider.credential(idToken ?? null, accessToken);
 
   const userCredential = await signInWithCredential(auth, credential);
 
-  console.log("🔥 Step 2: Firebase sign-in success");
-
   const firebaseToken = await userCredential.user.getIdToken();
 
-  console.log("🔥 Step 3: Firebase token received");
-
   const res = await loginWithFirebaseToken(firebaseToken);
-
-  console.log("🔥 Step 4: Backend response:", res);
 
   if (!res?.success) {
     throw new Error("Backend login failed");
@@ -166,7 +162,9 @@ console.log("ID Token:", idToken);
 
     const data = await res.json();
 
-    console.log("OTP SENT:", data);
+    if (!res.ok || !data.sessionInfo) {
+      throw new Error(data?.error?.message || "OTP send failed");
+    }
 
     router.push({
       pathname: "/(auth)/Otpverifyscreen",
@@ -177,14 +175,15 @@ console.log("ID Token:", idToken);
     });
 
   } catch (err) {
-    console.log(err);
-    Alert.alert("OTP send failed");
+    Alert.alert(
+      "OTP send failed",
+      err instanceof Error ? err.message : "Please try again."
+    );
   }
 };
 
   const handleGoogleLogin = async (): Promise<void> => {
   try {
-    console.log("REQUEST BEFORE PROMPT:", googleRequest);
     if (!googleRequest) {
       Alert.alert('Not ready', 'Google login not initialized yet');
       return;

@@ -1,7 +1,6 @@
-console.log("OtpVerifyScreen rendering");
-
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
+  Alert,
   View,
   Text,
   TextInput,
@@ -20,7 +19,6 @@ import { PhoneAuthProvider, signInWithCredential } from "firebase/auth";
 import { auth } from "@/config/firebase";
 import { loginWithFirebaseToken } from "@/services/authApi";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { Alert } from "react-native";
 
 
 
@@ -156,7 +154,7 @@ const OtpBox: React.FC<OtpBoxProps> = ({ value, isFocused, isError, index, entry
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-const OtpVerifyScreen: React.FC<OtpVerifyScreenProps> = ({ navigation, route }) => {
+const OtpVerifyScreen: React.FC<OtpVerifyScreenProps> = () => {
   const { width, height } = useWindowDimensions();
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(''));
  const [focusedIndex, setFocusedIndex] = useState<number | null>(0);
@@ -166,10 +164,6 @@ const OtpVerifyScreen: React.FC<OtpVerifyScreenProps> = ({ navigation, route }) 
   const [canResend, setCanResend] = useState<boolean>(false);
   const router = useRouter();
 const { sessionInfo, phone: phoneParam } = useLocalSearchParams();
-
-console.log("OTP SCREEN OPENED");
-console.log("sessionInfo:", sessionInfo);
-console.log("phone:", phoneParam);
 
 const phoneNumber = Array.isArray(phoneParam) ? phoneParam[0] : phoneParam ?? '';
   const inputRefs = useRef<(TextInput | null)[]>(Array(OTP_LENGTH).fill(null));
@@ -259,11 +253,7 @@ const phoneNumber = Array.isArray(phoneParam) ? phoneParam[0] : phoneParam ?? ''
 
     const firebaseToken = await userCredential.user.getIdToken();
 
-    console.log("FIREBASE TOKEN:", firebaseToken);
-
-    const res = await loginWithFirebaseToken(firebaseToken);
-
-    console.log("LOGIN SUCCESS", res);
+    await loginWithFirebaseToken(firebaseToken);
 
     router.replace("/(tabs)");
   } catch (err) {

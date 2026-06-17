@@ -1,9 +1,23 @@
-import { View, Text } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 export default function HomeScreen() {
   return (
-    <View>
-      <Text>Home Screen</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Login success by google</Text>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#fdf6ee",
+  },
+  title: {
+    color: "#2d1a0e",
+    fontSize: 20,
+    fontWeight: "700",
+  },
+});

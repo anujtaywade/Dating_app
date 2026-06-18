@@ -19,7 +19,7 @@ import { useRouter } from 'expo-router';
 import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
 import { auth } from '@/config/firebase';
 import { useGoogleLogin } from '@/hooks/useGoogleAuth';
-import { loginWithFirebaseToken } from '@/services/authApi';
+import { getPostLoginRoute, loginWithFirebaseToken, saveAuthToken } from '@/services/authApi';
 
 
 
@@ -127,7 +127,8 @@ const LoginScreen: React.FC<LoginScreenProps> = () => {
     throw new Error("Backend login failed");
   }
 
-  router.replace('/(tabs)');
+  await saveAuthToken(res.token);
+  router.replace(getPostLoginRoute(res.user));
 } catch (error) {
   Alert.alert(
     'Google sign in failed',

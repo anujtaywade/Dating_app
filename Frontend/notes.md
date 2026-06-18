@@ -13,3 +13,4 @@ login page created but unable to see it in mobile ✅
 google login completed ✅
 phone login error (persistence error)
 mobile expo go scrren black error ✅
+The image upload size is 15MB max with no compression IG fix this in future 

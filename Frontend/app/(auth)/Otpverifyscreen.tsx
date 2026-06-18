@@ -17,7 +17,7 @@ import {
 
 import { PhoneAuthProvider, signInWithCredential } from "firebase/auth";
 import { auth } from "@/config/firebase";
-import { loginWithFirebaseToken } from "@/services/authApi";
+import { getPostLoginRoute, loginWithFirebaseToken, saveAuthToken } from "@/services/authApi";
 import { useRouter, useLocalSearchParams } from "expo-router";
 
 
@@ -253,9 +253,10 @@ const phoneNumber = Array.isArray(phoneParam) ? phoneParam[0] : phoneParam ?? ''
 
     const firebaseToken = await userCredential.user.getIdToken();
 
-    await loginWithFirebaseToken(firebaseToken);
+    const res = await loginWithFirebaseToken(firebaseToken);
 
-    router.replace("/(tabs)");
+    await saveAuthToken(res.token);
+    router.replace(getPostLoginRoute(res.user));
   } catch (err) {
     console.log(err);
     setIsError(true);

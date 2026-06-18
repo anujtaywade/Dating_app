@@ -63,7 +63,21 @@ const userSchema = new mongoose.Schema(
 
     bio: String,
 
+    educationOrWork: {
+      type: String,
+      enum: ["studying", "working"],
+    },
+
+    heightCm: Number,
+
+    relationshipGoal: {
+      type: String,
+      enum: ["long-term", "short-term", "casual", "figuring-out"],
+    },
+
     photos: [String],
+
+    prompts: [String],
 
     
   lastDiscoverDate: {

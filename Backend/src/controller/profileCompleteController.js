@@ -11,7 +11,11 @@ exports.completeProfile= async (req,res) => {
             gender,
             intrestedIn,
             bio,
+            educationOrWork,
+            heightCm,
+            relationshipGoal,
             photos,
+            prompts,
             location
         } = req.body
 
@@ -44,7 +48,11 @@ exports.completeProfile= async (req,res) => {
       if (gender !== undefined) user.gender = gender;
       if (intrestedIn !== undefined) user.intrestedIn = intrestedIn;
       if (bio !== undefined) user.bio = bio;
+      if (educationOrWork !== undefined) user.educationOrWork = educationOrWork;
+      if (heightCm !== undefined) user.heightCm = heightCm;
+      if (relationshipGoal !== undefined) user.relationshipGoal = relationshipGoal;
       if (photos !== undefined) user.photos = photos;
+      if (prompts !== undefined) user.prompts = prompts;
         
        user.profileCompleted = Boolean(
         user.name &&
@@ -52,8 +60,12 @@ exports.completeProfile= async (req,res) => {
         user.gender &&
         user.intrestedIn &&
         user.bio &&
+        user.educationOrWork &&
+        user.relationshipGoal &&
         Array.isArray(user.photos) &&
-        user.photos.length > 0 &&
+        user.photos.length >= 6 &&
+        Array.isArray(user.prompts) &&
+        user.prompts.length >= 3 &&
         user.location &&
         Array.isArray(user.location.coordinates) &&
         user.location.coordinates.length === 2

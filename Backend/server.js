@@ -30,6 +30,7 @@ app.use('/skip',require('./src/routes/skipUserRoute'))
 app.use('/block',require('./src/routes/blockRoute'))
 app.use('/report',require('./src/routes/reportRoute'))
 app.use("/auth", require("./src/routes/firebaseAuthRoute"));
+app.use("/upload", require("./src/routes/uploadRoute"))
 
 app.get("/", (req, res) => {
   res.send("Dating app backend running!");

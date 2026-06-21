@@ -105,24 +105,8 @@ export default function CompleteProfileScreen() {
       if (!form.intrestedIn) return "Select who you are interested in.";
     }
 
-    if (step === 2 && form.photos.some((photo) => !photo.trim())) {
-      return "Add all 6 photo links.";
-    }
-
-    if (step === 3 && !form.bio.trim()) {
-      return "Write a short bio.";
-    }
-
-    if (step === 3 && !form.educationOrWork) {
-      return "Select studying or working.";
-    }
-
-    if (step === 3 && ((form.heightFeet && !form.heightInches) || (!form.heightFeet && form.heightInches))) {
-      return "Select both feet and inches for height.";
-    }
-
-    if (step === 3 && !form.relationshipGoal) {
-      return "Select your relationship goal.";
+    if (step === 2 && !form.photos[0]?.trim()) {
+      return "Add your main photo.";
     }
 
     if (step === 4 && form.prompts.filter((prompt) => prompt.trim()).length < 3) {
@@ -180,11 +164,13 @@ export default function CompleteProfileScreen() {
       dob: dobToIsoDate(form.dob),
       gender: form.gender as Gender,
       intrestedIn: form.intrestedIn as Gender,
-      photos: form.photos.map((photo) => photo.trim()),
-      bio: form.bio.trim(),
-      educationOrWork: form.educationOrWork as EducationOrWork,
+      photos: form.photos.map((photo) => photo.trim()).filter(Boolean),
+      ...(form.bio.trim() ? { bio: form.bio.trim() } : {}),
+      ...(form.educationOrWork
+        ? { educationOrWork: form.educationOrWork as EducationOrWork }
+        : {}),
       heightCm,
-      relationshipGoal: form.relationshipGoal || "figuring-out",
+      ...(form.relationshipGoal ? { relationshipGoal: form.relationshipGoal } : {}),
       prompts: form.prompts.map((prompt) => prompt.trim()).filter(Boolean),
       location: {
         type: "Point",

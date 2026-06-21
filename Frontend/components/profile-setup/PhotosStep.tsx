@@ -70,7 +70,7 @@ export function PhotosStep({ form, updateList }: Props) {
   return (
     <>
       <Text style={styles.stepTitle}>Photos</Text>
-      <Text style={styles.stepSub}>Add 6 clear photos. Your first photo should show your face.</Text>
+      <Text style={styles.stepSub}>Add a main photo to continue. The other 5 photos are optional.</Text>
       <View style={styles.photoGrid}>
         {form.photos.map((photo, index) => {
           const previewUri = localPreviews[index] || photo;
@@ -86,7 +86,9 @@ export function PhotosStep({ form, updateList }: Props) {
               {previewUri ? (
                 <Image source={{ uri: previewUri }} style={styles.photoImage} />
               ) : (
-                <Text style={styles.photoSlotText}>Add{"\n"}Photo {index + 1}</Text>
+                <Text style={styles.photoSlotText}>
+                  Add{"\n"}{index === 0 ? "Main Photo" : `Photo ${index + 1}`}
+                </Text>
               )}
 
               {previewUri && !isUploading && (

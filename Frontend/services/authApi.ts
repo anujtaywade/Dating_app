@@ -42,10 +42,10 @@ export type CompleteProfilePayload = {
   gender: "male" | "female";
   intrestedIn: "male" | "female";
   photos: string[];
-  bio: string;
-  educationOrWork: "studying" | "working";
+  bio?: string;
+  educationOrWork?: "studying" | "working";
   heightCm?: number;
-  relationshipGoal: "long-term" | "short-term" | "casual" | "figuring-out";
+  relationshipGoal?: "long-term" | "short-term" | "casual" | "figuring-out";
   prompts: string[];
   location: {
     type: "Point";

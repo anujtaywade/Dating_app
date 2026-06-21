@@ -59,11 +59,8 @@ exports.completeProfile= async (req,res) => {
         user.dob &&
         user.gender &&
         user.intrestedIn &&
-        user.bio &&
-        user.educationOrWork &&
-        user.relationshipGoal &&
         Array.isArray(user.photos) &&
-        user.photos.length >= 6 &&
+        user.photos.length >= 1 &&
         Array.isArray(user.prompts) &&
         user.prompts.length >= 3 &&
         user.location &&

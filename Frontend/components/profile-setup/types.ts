@@ -2,6 +2,11 @@ export type Gender = "male" | "female";
 export type EducationOrWork = "studying" | "working";
 export type RelationshipGoal = "long-term" | "short-term" | "casual" | "figuring-out";
 
+export type PromptResponse = {
+  prompt: string;
+  answer: string;
+};
+
 export type FormState = {
   name: string;
   dob: string;
@@ -13,7 +18,7 @@ export type FormState = {
   heightFeet: string;
   heightInches: string;
   relationshipGoal: RelationshipGoal | "";
-  prompts: string[];
+  prompts: PromptResponse[];
   city: string;
   latitude: string;
   longitude: string;
@@ -21,4 +26,4 @@ export type FormState = {
 
 export type UpdateField = <K extends keyof FormState>(key: K, value: FormState[K]) => void;
 
-export type UpdateList = (key: "photos" | "prompts", index: number, value: string) => void;
+export type UpdateList = (key: "photos", index: number, value: string) => void;

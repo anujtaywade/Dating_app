@@ -20,7 +20,12 @@ import { LocationStep } from "@/components/profile-setup/LocationStep";
 import { PhotosStep } from "@/components/profile-setup/PhotosStep";
 import { PromptsStep } from "@/components/profile-setup/PromptsStep";
 import { setupStyles as styles } from "@/components/profile-setup/setupStyles";
-import { EducationOrWork, FormState, Gender } from "@/components/profile-setup/types";
+import {
+  EducationOrWork,
+  FormState,
+  Gender,
+  PromptResponse,
+} from "@/components/profile-setup/types";
 
 const TOTAL_STEPS = 6;
 
@@ -35,7 +40,7 @@ const initialForm: FormState = {
   heightFeet: "",
   heightInches: "",
   relationshipGoal: "",
-  prompts: Array(3).fill(""),
+  prompts: Array.from({ length: 3 }, () => ({ prompt: "", answer: "" })),
   city: "",
   latitude: "",
   longitude: "",
@@ -86,11 +91,19 @@ export default function CompleteProfileScreen() {
     setForm((current) => ({ ...current, [key]: value }));
   };
 
-  const updateList = (key: "photos" | "prompts", index: number, value: string) => {
+  const updateList = (key: "photos", index: number, value: string) => {
     setForm((current) => {
       const next = [...current[key]];
       next[index] = value;
       return { ...current, [key]: next };
+    });
+  };
+
+  const updatePrompt = (index: number, value: PromptResponse) => {
+    setForm((current) => {
+      const next = [...current.prompts];
+      next[index] = value;
+      return { ...current, prompts: next };
     });
   };
 
@@ -109,8 +122,16 @@ export default function CompleteProfileScreen() {
       return "Add your main photo.";
     }
 
-    if (step === 4 && form.prompts.filter((prompt) => prompt.trim()).length < 3) {
-      return "Answer at least 3 prompts.";
+    if (step === 4) {
+      if (form.prompts.some((item) => item.prompt && !item.answer.trim())) {
+        return "Write an answer for each prompt you selected.";
+      }
+      const selectedPrompts = form.prompts
+        .map((item) => item.prompt)
+        .filter(Boolean);
+      if (new Set(selectedPrompts).size !== selectedPrompts.length) {
+        return "Choose a different question for each prompt.";
+      }
     }
 
     if (step === 5) {
@@ -171,7 +192,12 @@ export default function CompleteProfileScreen() {
         : {}),
       heightCm,
       ...(form.relationshipGoal ? { relationshipGoal: form.relationshipGoal } : {}),
-      prompts: form.prompts.map((prompt) => prompt.trim()).filter(Boolean),
+      prompts: form.prompts
+        .filter(({ prompt, answer }) => prompt && answer.trim())
+        .map(({ prompt, answer }) => ({
+          prompt,
+          answer: answer.trim(),
+        })),
       location: {
         type: "Point",
         coordinates: [Number(form.longitude), Number(form.latitude)],
@@ -225,7 +251,7 @@ export default function CompleteProfileScreen() {
             },
           ]}
         >
-          {renderStep(step, form, updateField, updateList)}
+          {renderStep(step, form, updateField, updateList, updatePrompt)}
         </Animated.View>
 
         {!!error && <Text style={styles.error}>{error}</Text>}
@@ -261,7 +287,8 @@ function renderStep(
   step: number,
   form: FormState,
   updateField: <K extends keyof FormState>(key: K, value: FormState[K]) => void,
-  updateList: (key: "photos" | "prompts", index: number, value: string) => void
+  updateList: (key: "photos", index: number, value: string) => void,
+  updatePrompt: (index: number, value: PromptResponse) => void
 ) {
   if (step === 0) {
     return <BasicInfoStep form={form} updateField={updateField} />;
@@ -280,7 +307,7 @@ function renderStep(
   }
 
   if (step === 4) {
-    return <PromptsStep form={form} updateList={updateList} />;
+    return <PromptsStep form={form} updatePrompt={updatePrompt} />;
   }
 
   return <LocationStep form={form} updateField={updateField} />;

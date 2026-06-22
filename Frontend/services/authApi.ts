@@ -46,7 +46,10 @@ export type CompleteProfilePayload = {
   educationOrWork?: "studying" | "working";
   heightCm?: number;
   relationshipGoal?: "long-term" | "short-term" | "casual" | "figuring-out";
-  prompts: string[];
+  prompts: Array<{
+    prompt: string;
+    answer: string;
+  }>;
   location: {
     type: "Point";
     coordinates: [number, number];

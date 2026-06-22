@@ -77,7 +77,18 @@ const userSchema = new mongoose.Schema(
 
     photos: [String],
 
-    prompts: [String],
+    prompts: [{
+      prompt: {
+        type: String,
+        required: true,
+      },
+      answer: {
+        type: String,
+        required: true,
+        maxlength: 160,
+      },
+      _id: false,
+    }],
 
     
   lastDiscoverDate: {

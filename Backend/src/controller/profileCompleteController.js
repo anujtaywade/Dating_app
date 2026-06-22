@@ -52,7 +52,35 @@ exports.completeProfile= async (req,res) => {
       if (heightCm !== undefined) user.heightCm = heightCm;
       if (relationshipGoal !== undefined) user.relationshipGoal = relationshipGoal;
       if (photos !== undefined) user.photos = photos;
-      if (prompts !== undefined) user.prompts = prompts;
+      if (prompts !== undefined) {
+        const validPrompts =
+          Array.isArray(prompts) &&
+          prompts.length <= 3 &&
+          prompts.every(
+            (item) =>
+              item &&
+              typeof item.prompt === "string" &&
+              item.prompt.trim() &&
+              typeof item.answer === "string" &&
+              item.answer.trim() &&
+              item.answer.trim().length <= 160
+          );
+
+        const promptNames = validPrompts
+          ? prompts.map((item) => item.prompt.trim())
+          : [];
+
+        if (!validPrompts || new Set(promptNames).size !== promptNames.length) {
+          return res.status(400).json({
+            message: "Choose up to 3 different prompts and answer each one (maximum 160 characters)."
+          });
+        }
+
+        user.prompts = prompts.map((item) => ({
+          prompt: item.prompt.trim(),
+          answer: item.answer.trim()
+        }));
+      }
         
        user.profileCompleted = Boolean(
         user.name &&
@@ -61,8 +89,6 @@ exports.completeProfile= async (req,res) => {
         user.intrestedIn &&
         Array.isArray(user.photos) &&
         user.photos.length >= 1 &&
-        Array.isArray(user.prompts) &&
-        user.prompts.length >= 3 &&
         user.location &&
         Array.isArray(user.location.coordinates) &&
         user.location.coordinates.length === 2

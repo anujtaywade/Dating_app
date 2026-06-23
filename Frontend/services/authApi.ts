@@ -46,16 +46,18 @@ export type CompleteProfilePayload = {
   educationOrWork?: "studying" | "working";
   heightCm?: number;
   relationshipGoal?: "long-term" | "short-term" | "casual" | "figuring-out";
-  prompts: Array<{
+  prompts: {
     prompt: string;
     answer: string;
-  }>;
+  }[];
   location: {
     type: "Point";
     coordinates: [number, number];
     city?: string;
   };
 };
+
+export type ProfileLocation = CompleteProfilePayload["location"];
 
 export const AUTH_TOKEN_KEY = "authToken";
 
@@ -83,7 +85,7 @@ export async function loginWithFirebaseToken(
       },
       body: JSON.stringify({ firebaseToken }),
     });
-  } catch (error) {
+  } catch {
     throw new Error(
       `Cannot reach backend at ${endpoint}. Make sure the backend is running and EXPO_PUBLIC_API_BASE_URL points to this computer's reachable IP address.`
     );
@@ -125,6 +127,30 @@ export async function completeProfile(
   }
 
   return data;
+}
+
+export async function updateCurrentLocation(location: ProfileLocation): Promise<void> {
+  const token = await AsyncStorage.getItem(AUTH_TOKEN_KEY);
+
+  if (!token) {
+    throw new Error("Missing auth token. Please login again.");
+  }
+
+  const apiBaseUrl = getApiBaseUrl();
+  const endpoint = `${apiBaseUrl}/profile/profile`;
+  const response = await fetch(endpoint, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ location }),
+  });
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => null);
+    throw new Error(data?.message || "Location update failed");
+  }
 }
 
 export async function uploadProfilePhotos(

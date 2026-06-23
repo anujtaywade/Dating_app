@@ -25,19 +25,28 @@ exports.completeProfile= async (req,res) => {
             return res.status(404).json({message : "User not found"})
         }
 
-         if (location) {
+      if (location) {
+        const longitude = Number(location.coordinates?.[0]);
+        const latitude = Number(location.coordinates?.[1]);
+
         if (
           !Array.isArray(location.coordinates) ||
-          location.coordinates.length !== 2
+          location.coordinates.length !== 2 ||
+          !Number.isFinite(longitude) ||
+          !Number.isFinite(latitude) ||
+          longitude < -180 ||
+          longitude > 180 ||
+          latitude < -90 ||
+          latitude > 90
         ) {
           return res.status(400).json({
-            message: "Location coordinates must be [longitude, latitude]"
+            message: "Location coordinates must be valid [longitude, latitude] values"
           });
         }
 
         user.location = {
           type: "Point",
-          coordinates: location.coordinates,
+          coordinates: [longitude, latitude],
           city: location.city || user.location?.city
         };
       }

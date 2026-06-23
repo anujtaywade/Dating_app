@@ -76,7 +76,11 @@ exports.getDiscoverUsers = async (req, res) => {
       $maxDistance: 50000 // 50km
     }
   }
-    }).limit(50);
+    })
+      .select(
+        "name dob gender bio educationOrWork heightCm relationshipGoal photos prompts location.city lastActive createdAt"
+      )
+      .limit(50);
 
     // 🧠 Ranking logic
     users = users.sort((a, b) => {

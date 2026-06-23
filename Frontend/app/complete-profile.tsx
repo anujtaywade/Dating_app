@@ -135,15 +135,18 @@ export default function CompleteProfileScreen() {
     }
 
     if (step === 5) {
+      if (!form.latitude || !form.longitude) {
+        return "Turn on location and allow access to continue.";
+      }
+
       const lat = Number(form.latitude);
       const lng = Number(form.longitude);
 
-      if (!form.city.trim()) return "Enter your city.";
       if (!Number.isFinite(lat) || lat < -90 || lat > 90) {
-        return "Enter a valid latitude.";
+        return "Your location could not be detected. Please refresh and try again.";
       }
       if (!Number.isFinite(lng) || lng < -180 || lng > 180) {
-        return "Enter a valid longitude.";
+        return "Your location could not be detected. Please refresh and try again.";
       }
     }
 
